@@ -20,25 +20,25 @@ def index():
 
 @api_routes.route('/signup', methods=['POST'])
 def signup():
-    params = json.loads(request.json.decode("utf-8"))
-    # params = request.json
+    # params = json.loads(request.json.decode("utf-8"))
+    params = request.json
     response = signup_user(params)
     return jsonify(response)
 
 
 @api_routes.route('/signin', methods=['POST'])
 def signin():
-    params = json.loads(request.json.decode("utf-8"))
-    # params = request.json
+    # params = json.loads(request.json.decode("utf-8"))
+    params = request.json
     response = signin_user(params)
     return jsonify(response)
 
 
 @api_routes.route('/get_parsed_data', methods=['POST'])
 def resume_parsing():
-    params = json.loads(request.json.decode("utf-8"))
+    # params = json.loads(request.json.decode("utf-8"))
     # files = request.files['files']
-    # params = request.json
+    params = request.json
     data = get_extracted_data(params)
     response = resume_data_create(params, data)
     return jsonify(response)
