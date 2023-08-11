@@ -5,6 +5,7 @@ from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
 from app.models.resumedata import resume_data_create
 from app.models.resume_parser_controler import get_extracted_data
+
 api_routes = Blueprint('api', __name__)
 
 
@@ -21,18 +22,25 @@ def index():
 @api_routes.route('/signup', methods=['POST'])
 def signup():
     """
-       Endpoint for user signup.
+        Endpoint for user signup.
 
-       This endpoint handles the registration of a new user. It expects a JSON payload
-       containing user information such as first name, last name, email, phone number,
-       country, password, organization name, organization address, and number of employees.
+        Handles the registration of a new user by expecting a JSON payload containing user information.
 
-       Args:
-           None (Relies on request.json to get payload)
+        Parameters:
+            None (Relies on request.json to obtain the following payload fields):
+            - first_name (str): The first name of the user.
+            - last_name (str): The last name of the user.
+            - email (str): The email address of the user.
+            - phone_number (str): The phone number of the user.
+            - country (str): The country of the user.
+            - password (str): The password chosen by the user.
+            - organization_name (str): The name of the user's organization.
+            - organization_address (str): The address of the user's organization.
+            - number_of_employees (int): The number of employees in the user's organization.
 
-       Returns:
-           dict: A JSON response containing the result of the signup process.
-       """
+        Returns:
+            dict: A JSON response containing the result of the signup process.
+    """
 
     params = json.loads(request.json.decode("utf-8"))
     # params = request.json
@@ -61,7 +69,7 @@ def signin():
 def resume_parsing():
     params = json.loads(request.json.decode("utf-8"))
     # files = request.files['files']
-    # params = request.jsong
+    # params = request.json
     data = get_extracted_data(params)
     response = resume_data_create(params, data)
     return jsonify(response)
