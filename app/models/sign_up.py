@@ -3,11 +3,14 @@ from app.db.user_model import login_user
 
 
 def signup_user(params):
+    first = params.get("first_name")
+    last = params.get("last_name")
     email = params.get('email')
     phone_number = params.get('phone_number')
     country = params.get('country')
     password = params.get('password')
     org_name = params.get("org_name")
+    org_address = params.get("org_address")
     no_emp = params.get("no_emp")
     username = email.split('@')[0]
 
@@ -26,8 +29,9 @@ def signup_user(params):
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     # Create a new user instance
-    new_user = login_user(username=username, email=email, phone_number=phone_number, country=country,
-                          password=hashed_password, org_name=org_name, no_of_emp=no_emp)
+    new_user = login_user(first_name=first, last_name=last, username=username, email=email, phone_number=phone_number,
+                          country=country, password=hashed_password, org_name=org_name, org_address=org_address,
+                          no_of_emp=no_emp)
 
     # Add the user to the database
     db.session.add(new_user)

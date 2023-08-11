@@ -8,7 +8,7 @@ from flask_jwt_extended import JWTManager
 dotenv_path = os.path.join(os.getcwd(), '.env')
 load_dotenv(dotenv_path)
 log_level = os.environ.get("LOG_LEVEL", 'INFO')
-log_path = os.environ.get("LOG_path", '/var/log/ai.log')
+log_path = os.environ.get("LOG_PATH", '/var/log/ai.log')
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(filename)s - %(funcName)s: %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S', level=log_level,
                     handlers=[logging.FileHandler(log_path), logging.StreamHandler()])
