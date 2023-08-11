@@ -20,6 +20,20 @@ def index():
 
 @api_routes.route('/signup', methods=['POST'])
 def signup():
+    """
+       Endpoint for user signup.
+
+       This endpoint handles the registration of a new user. It expects a JSON payload
+       containing user information such as first name, last name, email, phone number,
+       country, password, organization name, organization address, and number of employees.
+
+       Args:
+           None (Relies on request.json to get payload)
+
+       Returns:
+           dict: A JSON response containing the result of the signup process.
+       """
+
     params = json.loads(request.json.decode("utf-8"))
     # params = request.json
     response = signup_user(params)
@@ -28,6 +42,15 @@ def signup():
 
 @api_routes.route('/signin', methods=['POST'])
 def signin():
+    """
+       Endpoint for user sign-in.
+
+       This endpoint handles user authentication through sign-in. It expects a JSON payload
+       containing user credentials such as email and password.
+
+       Returns:
+           dict: A JSON response containing the result of the sign-in process.
+       """
     params = json.loads(request.json.decode("utf-8"))
     # params = request.json
     response = signin_user(params)
