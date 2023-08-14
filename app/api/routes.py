@@ -1,13 +1,10 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
-import json
 import os
-
 from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
 from app.models.resumedata import resume_data_create
 from app.models.resume_parser_controler import get_extracted_data
-from app.app import s3_client
 from app.models.put_presign_url import generate_presigned_url
 
 api_routes = Blueprint('api', __name__)
@@ -15,7 +12,7 @@ api_routes = Blueprint('api', __name__)
 
 # Define your routes using the blueprint
 @api_routes.route('/')
-# @cross_origin(supports_credentials=False)
+@cross_origin(supports_credentials=False)
 def index():
     data = {
         "message": "Server Started ...",
@@ -46,7 +43,6 @@ def signup():
             dict: A JSON response containing the result of the signup process.
     """
 
-    # params = json.loads(request.json.decode("utf-8"))
     params = request.json
     response = signup_user(params)
     return jsonify(response)
@@ -63,7 +59,6 @@ def signin():
        Returns:
            dict: A JSON response containing the result of the sign-in process.
        """
-    # params = json.loads(request.json.decode("utf-8"))
     params = request.json
     response = signin_user(params)
     return jsonify(response)
@@ -84,7 +79,6 @@ def resume_parsing():
       Returns:
           dict: A JSON response containing the result of the parsing and JSON data creation process.
       """
-    # params = json.loads(request.json.decode("utf-8"))
     params = request.json
     data = get_extracted_data(params)
     response = resume_data_create(params, data)
@@ -93,7 +87,6 @@ def resume_parsing():
 
 @api_routes.route('/get_presigned_url', methods=['POST'])
 def presigned_url_generation():
-    # params = json.loads(request.json.decode("utf-8"))
     params = request.json
     folder_name = os.environ.get("FOLDER_NAME")
     bucket_name = os.environ.get("S3_BUCKET_NAME")
