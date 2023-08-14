@@ -86,7 +86,6 @@ def Data_Parser(data):
                     time.sleep(wait_time)
                 else:
                     raise e
-
         parsed_data = parsed_data.choices[0].text
         return parsed_data
     except Exception as err:

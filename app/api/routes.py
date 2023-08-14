@@ -1,17 +1,21 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 import json
+import os
+
 from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
 from app.models.resumedata import resume_data_create
 from app.models.resume_parser_controler import get_extracted_data
+from app.app import s3_client
+from app.models.put_presign_url import generate_presigned_url
 
 api_routes = Blueprint('api', __name__)
 
 
 # Define your routes using the blueprint
 @api_routes.route('/')
-@cross_origin(supports_credentials=False)
+# @cross_origin(supports_credentials=False)
 def index():
     data = {
         "message": "Server Started ...",
@@ -42,8 +46,8 @@ def signup():
             dict: A JSON response containing the result of the signup process.
     """
 
-    params = json.loads(request.json.decode("utf-8"))
-    # params = request.json
+    # params = json.loads(request.json.decode("utf-8"))
+    params = request.json
     response = signup_user(params)
     return jsonify(response)
 
@@ -59,17 +63,45 @@ def signin():
        Returns:
            dict: A JSON response containing the result of the sign-in process.
        """
-    params = json.loads(request.json.decode("utf-8"))
-    # params = request.json
+    # params = json.loads(request.json.decode("utf-8"))
+    params = request.json
     response = signin_user(params)
     return jsonify(response)
 
 
 @api_routes.route('/get_parsed_data', methods=['POST'])
 def resume_parsing():
-    params = json.loads(request.json.decode("utf-8"))
-    # files = request.files['files']
-    # params = request.json
+    """
+      Endpoint for parsing resumes and creating JSON data.
+
+      This endpoint handles the parsing of uploaded resume files and creates JSON data
+      containing the extracted information. It expects a JSON payload containing parameters
+      for the parsing process and uploaded resume files.
+
+      Parameters: - params (dict): A dictionary containing parameters for the parsing process. Example parameters may
+      include settings for data extraction. - files (File): One or more uploaded resume files (PDFs) for processing.
+
+      Returns:
+          dict: A JSON response containing the result of the parsing and JSON data creation process.
+      """
+    # params = json.loads(request.json.decode("utf-8"))
+    params = request.json
     data = get_extracted_data(params)
     response = resume_data_create(params, data)
     return jsonify(response)
+
+
+@api_routes.route('/get_presigned_url', methods=['POST'])
+def presigned_url_generation():
+    # params = json.loads(request.json.decode("utf-8"))
+    params = request.json
+    folder_name = os.environ.get("FOLDER_NAME")
+    bucket_name = os.environ.get("S3_BUCKET_NAME")
+    obj_name = params.get("file_name")
+    if obj_name:
+        object_key = folder_name + obj_name
+        presigned_url = generate_presigned_url(bucket_name, object_key)
+        if presigned_url is not None:
+            return jsonify({"presigned_url": presigned_url})
+        else:
+            jsonify({"error": "Error generating presigned URL."})

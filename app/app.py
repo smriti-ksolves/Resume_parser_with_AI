@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+import boto3
+
 dotenv_path = os.path.join(os.getcwd(), '.env')
 load_dotenv(dotenv_path)
 log_level = os.environ.get("LOG_LEVEL", 'INFO')
@@ -37,3 +39,11 @@ bcrypt = Bcrypt(flask_app)
 flask_app.config['SECRET_KEY'] = 'c67a86ac99fc779a9d4af8f4a4d576b8194f392ba4449244b5ad13858b855b13'
 jwt = JWTManager(flask_app)
 
+# for s3 bucket
+access_key = os.environ.get("AWS_ACCESS_KEY_ID")
+access_secret = os.environ.get("AWS_SECRET_ACCESS_KEY")
+flask_app.config['S3_BUCKET_NAME'] = os.environ.get("S3_BUCKET_NAME")
+flask_app.config['AWS_ACCESS_KEY_ID'] = access_key
+flask_app.config['AWS_SECRET_ACCESS_KEY'] = access_secret
+s3_client = boto3.client('s3', aws_access_key_id=access_key,
+                         aws_secret_access_key=access_secret)
