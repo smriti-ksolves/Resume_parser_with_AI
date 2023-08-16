@@ -6,7 +6,7 @@ from app.models.sign_in import signin_user
 from app.models.resumedata import resume_data_create
 from app.models.resume_parser_controler import get_extracted_data
 from app.models.put_presign_url import generate_presigned_url
-
+from app.app import logger
 api_routes = Blueprint('api', __name__)
 
 
@@ -17,6 +17,7 @@ def index():
     data = {
         "message": "Server Started ...",
     }
+    logger.info("Server Running!")
     return jsonify(data)
 
 
@@ -28,7 +29,6 @@ def signup():
         Handles the registration of a new user by expecting a JSON payload containing user information.
 
         Parameters:
-            None (Relies on request.json to obtain the following payload fields):
             - first_name (str): The first name of the user.
             - last_name (str): The last name of the user.
             - email (str): The email address of the user.
@@ -90,11 +90,19 @@ def presigned_url_generation():
     params = request.json
     folder_name = os.environ.get("FOLDER_NAME")
     bucket_name = os.environ.get("S3_BUCKET_NAME")
-    obj_name = params.get("file_name")
-    if obj_name:
-        object_key = folder_name + obj_name
-        presigned_url = generate_presigned_url(bucket_name, object_key)
-        if presigned_url is not None:
-            return jsonify({"presigned_url": presigned_url})
-        else:
-            jsonify({"error": "Error generating presigned URL."})
+    try:
+        obj_names = params.get("file_names")
+        presigned_urls = []
+        for obj_name in obj_names:
+            if obj_name:
+                object_key = folder_name + obj_name
+                presigned_url = generate_presigned_url(bucket_name, object_key)
+                if presigned_url is not None:
+                    presigned_urls.append(presigned_url)
+                else:
+                    presigned_urls.append("")
+
+        return jsonify({"presigned_urls": presigned_urls})
+    except Exception as err:
+        logger.error(err)
+        return jsonify({"error": "Something Went wrong while generating URL"})

@@ -3,6 +3,21 @@ from app.db.user_model import login_user
 
 
 def signup_user(params):
+    """
+      Sign up a new user.
+
+      This function takes user parameters, validates them, and creates a new user entry in the database
+      if the provided information is valid and unique.
+
+      Args:
+          params (dict): A dictionary containing user registration parameters.
+              Expected keys: "first_name" (str), "last_name" (str), "email" (str), "phone_number" (str),
+                             "country" (str), "password" (str), "org_name" (str), "org_address" (str),
+                             "no_emp" (int, optional).
+
+      Returns:
+          dict: A message indicating the success of the user creation or an error message.
+    """
     first = params.get("first_name")
     last = params.get("last_name")
     email = params.get('email')
