@@ -31,7 +31,5 @@ def get_file(object_key, bucket_name, folder_prefix):
             with open(object_key, 'wb') as data:
                 # Download the file and save it locally
                 s3_client.download_fileobj(bucket_name, object_key, data)
-        return {"success": "File Downloaded Successfully"}
     except Exception as err:
         logger.error(err)
-        return {"error": "Something went wrong while downloading the pdf"}

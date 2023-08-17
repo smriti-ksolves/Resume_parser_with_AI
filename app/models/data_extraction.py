@@ -1,10 +1,9 @@
 import pdfplumber
-from app.models.get_presigned_url import get_file
 import os
 from app.app import logger
 
 
-def extract_text_from_pdf(file_name, folder_name):
+def extract_text_from_pdf(file_name):
     """
      Extract text from a PDF file.
 
@@ -19,14 +18,10 @@ def extract_text_from_pdf(file_name, folder_name):
          str: Extracted text content from the PDF file.
      """
     # Get the S3 bucket name from environment variable
-    bucket_name = os.environ.get("S3_BUCKET_NAME")
-
-    # Get the PDF file from the S3 bucket using the provided function get_file()
-    response = get_file(file_name, bucket_name, folder_name)
-    if "error" in response:
-        return response
-    logger.info("Pdf Data Extraction Started")
+    text = ""
     try:
+        # Get the PDF file from the S3 bucket using the provided function get_file()
+        logger.info("Pdf Data Extraction Started")
         # Open the PDF file using pdfplumber
         with pdfplumber.open(file_name) as pdf:
             # Iterate through each page and extract text
@@ -34,4 +29,4 @@ def extract_text_from_pdf(file_name, folder_name):
             return text  # Return the extracted text
     except Exception as err:
         logger.error(err)
-        return {"error": "PDF text extraction failed."}
+        return text

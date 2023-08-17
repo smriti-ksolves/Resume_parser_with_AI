@@ -3,7 +3,6 @@ from flask_cors import cross_origin
 import os
 from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
-from app.models.resumedata import resume_data_create
 from app.models.resume_parser_controler import get_extracted_data
 from app.models.put_presign_url import generate_presigned_url
 from app.app import logger
@@ -92,9 +91,8 @@ def resume_parsing():
 
         if "error" in data:
             return jsonify(data), 400  # Bad Request status code
-
-        response = resume_data_create(params, data)
-        return jsonify(response), 200
+        else:
+            return jsonify(data), 200
 
     except Exception as e:
         logger.error(e)

@@ -2,6 +2,8 @@ import os
 from app.models.data_parser import Data_Parser, response_validation
 from app.models.data_extraction import extract_text_from_pdf
 from app.app import logger
+from app.models.resumedata import resume_data_create
+from app.models.get_presigned_url import get_file
 
 
 def get_extracted_data(params):
@@ -18,32 +20,41 @@ def get_extracted_data(params):
     Returns:
         dict: Processed data extracted from PDF files.
     """
+    candidates_data = []
     for file in params.get("files"):
-        try:
+        data_dict = dict()
+        if isinstance(file, str) and file.endswith(".pdf"):
             folder = os.environ.get("FOLDER_NAME")
             file_obj = folder + file
+            bucket_name = os.environ.get("S3_BUCKET_NAME")
 
-            # Extract text data from the PDF file
-            text_data = extract_text_from_pdf(file_obj, folder)
-            if "error" in text_data:
-                return text_data
+            try:
+                get_file(file_obj, bucket_name, folder)
 
-            # Parse the extracted text data
-            res = Data_Parser(text_data)
-            if "error" in res:
-                return res
+                # Extract text data from the PDF file
+                text_data = extract_text_from_pdf(file_obj)
 
-            # Validate and filter the parsed response
-            response = response_validation(res)
-            if response:
-                # Remove the local PDF file
-                os.remove(file_obj)
+                if text_data:
+                    # Parse the extracted text data
+                    res = Data_Parser(text_data)
 
-                return response  # Return the processed response
-            else:
-                return {"error": "Error during response validation"}
-        except Exception as err:
-            logger.error(err)
-            return {"error": "An error occurred during processing."}
+                    # Validate and filter the parsed response
+                    if res is not None:
+                        data = response_validation(res)
+                        if data:
+                            # Remove the local PDF file
+                            response = resume_data_create(params, data)
+                            if response is not None:
+                                data_dict[file] = response
+                                candidates_data.append(data_dict)
 
-    return {"error": "No files found for processing."}
+            except Exception as err:
+                logger.error(err)
+                candidates_data.append({file: {}})
+
+            finally:
+                if os.path.exists(file_obj):
+                    os.remove(file_obj)
+        else:
+            candidates_data.append({file: {}})
+    return candidates_data

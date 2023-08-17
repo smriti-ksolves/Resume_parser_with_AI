@@ -38,41 +38,30 @@ def Data_Parser(data):
         str: Parsed resume data in JSON format.
     """
     try:
-        # Construct the prompt with instructions for extracting details
-        prompt_file = open(r"app/db/prompt.txt")
-        prompt = prompt_file.read()
-        prompt = prompt + data[:6000]
+        # Read the prompt instructions from a file
+        with open(r"app/db/prompt.txt") as prompt_file:
+            prompt = prompt_file.read()
 
-        # Function to make a request to OpenAI's text-davinci-003 engine
-        def make_openai_request():
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
-                max_tokens=1000  # Adjust as needed
-            )
-            return response
+        # Construct the prompt by appending data
+        prompt += data[:6000]
 
-        while True:
-            try:
-                parsed_data = make_openai_request()
-                break  # If successful, break the loop
-            except openai.error.OpenAIError as e:
-                if "rate_limit_exceeded" in str(e):
-                    logger.info("Rate limit exceeded. Waiting for a moment before retrying...")
-                    time.sleep(20)  # Wait for a moment before retrying
-                elif "You exceeded your current quota" in str(e):
-                    logger.error("Exceeded OpenAI API quota. Please check your plan and billing details.")
-                    return {"error": "Exceeded OpenAI API quota. Please check your plan and billing details."}
-                else:
-                    logger.error(e)
-                    return {"error": str(e)}
+        # Make a request to OpenAI's text-davinci-003 engine
+        parsed_data = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=1000  # Adjust as needed
+        )
 
-        parsed_data = parsed_data.choices[0].text  # Extract the generated text from the response
-        return parsed_data
+        return parsed_data.choices[0].text  # Extract the generated text
 
-    except Exception as err:
-        logger.error(err)
-        return {"error": f"An error occurred while parsing: {err}"}
+    except openai.error.OpenAIError as e:
+        if "rate_limit_exceeded" in str(e):
+            logger.info("Rate limit exceeded.")
+        elif "You exceeded your current quota" in str(e):
+            logger.error("Exceeded OpenAI API quota. Please check your plan and billing details.")
+        else:
+            logger.error(e)
+        return None
 
 
 def clean_name(name):

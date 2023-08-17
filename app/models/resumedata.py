@@ -17,21 +17,26 @@ def resume_data_create(params, data):
     Returns:
         dict: A message indicating the success of the operation or an error message.
     """
-    user_id = params.get("user_id")
-    email = params.get("email")
+    try:
+        user_id = params.get("user_id")
+        email = params.get("email")
 
-    # Check if all required fields are provided
-    if not user_id or not email or not data:
-        return {'error': 'All fields are required.'}
+        # Check if all required fields are provided
+        if not user_id or not email or not data:
+            return {'error': 'All fields are required.'}
 
-    # Extract username from the email
-    username = email.split('@')[0]
+        # Extract username from the email
+        username = email.split('@')[0]
 
-    # Create a new entry with candidate resume data
-    new_data = resume_data(user_id=user_id, username=username, email=email, candidate_data=data)
+        # Create a new entry with candidate resume data
+        new_data = resume_data(user_id=user_id, username=username, email=email, candidate_data=data)
 
-    # Add the new entry to the database and commit changes
-    db.session.add(new_data)
-    db.session.commit()
-    logger.info("Candidate Data Added successfully")
-    return {'message': 'Candidate Data Added successfully.'}
+        # Add the new entry to the database and commit changes
+        db.session.add(new_data)
+        db.session.commit()
+        logger.info("Candidate Data Added successfully")
+        return data
+    except Exception as err:
+        logger.error(err)
+        return None
+
