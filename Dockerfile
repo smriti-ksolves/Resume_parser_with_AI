@@ -1,9 +1,10 @@
 # Use a base Python image
 FROM python:3.9
 RUN apt-get update
+
 # Set the working directory
 WORKDIR /usr/src/app
-
+RUN touch ai.log
 # Copy the requirements file
 COPY requirements.txt .
 
