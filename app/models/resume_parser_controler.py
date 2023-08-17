@@ -47,14 +47,22 @@ def get_extracted_data(params):
                             if response is not None:
                                 data_dict[file] = response
                                 candidates_data.append(data_dict)
+                            else:
+                                candidates_data.append({file: {"error": "Error while storing data in database"}})
+                        else:
+                            candidates_data.append({file: {"error": "Parser Data has some incorrect data format"}})
+                    else:
+                        candidates_data.append({file: {"error": "Error While parsing data from open AI"}})
+                else:
+                    candidates_data.append({file: {"error": "Error while Extracting data from pdf"}})
 
             except Exception as err:
                 logger.error(err)
-                candidates_data.append({file: {}})
+                candidates_data.append({file: {"error": str(err)}})
 
             finally:
                 if os.path.exists(file_obj):
                     os.remove(file_obj)
         else:
-            candidates_data.append({file: {}})
+            candidates_data.append({file: {"error": "Please upload valid file"}})
     return candidates_data

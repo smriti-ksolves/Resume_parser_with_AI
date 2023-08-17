@@ -89,10 +89,7 @@ def resume_parsing():
         params = request.json
         data = get_extracted_data(params)
 
-        if "error" in data:
-            return jsonify(data), 400  # Bad Request status code
-        else:
-            return jsonify(data), 200
+        return jsonify(data), 200
 
     except Exception as e:
         logger.error(e)
