@@ -42,8 +42,13 @@ jwt = JWTManager(flask_app)
 # for s3 bucket
 access_key = os.environ.get("AWS_ACCESS_KEY_ID")
 access_secret = os.environ.get("AWS_SECRET_ACCESS_KEY")
+region = os.environ.get("S3_REGION")
 flask_app.config['S3_BUCKET_NAME'] = os.environ.get("S3_BUCKET_NAME")
+
 flask_app.config['AWS_ACCESS_KEY_ID'] = access_key
 flask_app.config['AWS_SECRET_ACCESS_KEY'] = access_secret
+
 s3_client = boto3.client('s3', aws_access_key_id=access_key,
-                         aws_secret_access_key=access_secret)
+                         aws_secret_access_key=access_secret,
+                         region_name=region
+                         )

@@ -7,6 +7,7 @@ from app.models.resumedata import resume_data_create
 from app.models.resume_parser_controler import get_extracted_data
 from app.models.put_presign_url import generate_presigned_url
 from app.app import logger
+
 api_routes = Blueprint('api', __name__)
 
 
@@ -45,7 +46,10 @@ def signup():
 
     params = request.json
     response = signup_user(params)
-    return jsonify(response)
+    if 'error' in response:
+        return jsonify(response), 400  # Bad Request status code
+    else:
+        return jsonify(response), 201  # Created status code
 
 
 @api_routes.route('/signin', methods=['POST'])
@@ -61,7 +65,10 @@ def signin():
        """
     params = request.json
     response = signin_user(params)
-    return jsonify(response)
+    if 'error' in response:
+        return jsonify(response), 401  # Unauthorized status code
+    else:
+        return jsonify(response), 200  # OK status code
 
 
 @api_routes.route('/get_parsed_data', methods=['POST'])
@@ -79,30 +86,41 @@ def resume_parsing():
       Returns:
           dict: A JSON response containing the result of the parsing and JSON data creation process.
       """
-    params = request.json
-    data = get_extracted_data(params)
-    response = resume_data_create(params, data)
-    return jsonify(response)
+    try:
+        params = request.json
+        data = get_extracted_data(params)
+
+        if "error" in data:
+            return jsonify(data), 400  # Bad Request status code
+
+        response = resume_data_create(params, data)
+        return jsonify(response), 200
+
+    except Exception as e:
+        logger.error(e)
+        return jsonify({"error": "An error occurred during resume parsing."}), 500  # Internal Server Error status code
 
 
 @api_routes.route('/get_presigned_url', methods=['POST'])
 def presigned_url_generation():
-    params = request.json
     folder_name = os.environ.get("FOLDER_NAME")
     bucket_name = os.environ.get("S3_BUCKET_NAME")
+    params = request.json
+    presigned_url_list = []
     try:
-        obj_names = params.get("file_names")
-        presigned_urls = []
-        for obj_name in obj_names:
-            if obj_name:
-                object_key = folder_name + obj_name
-                presigned_url = generate_presigned_url(bucket_name, object_key)
-                if presigned_url is not None:
-                    presigned_urls.append(presigned_url)
-                else:
-                    presigned_urls.append("")
+        for file in params["file_names"]:
+            if file:
+                try:
+                    object_key = os.path.join(folder_name, file)
+                    presigned_url = generate_presigned_url(bucket_name, object_key)
+                    if presigned_url is not None:
+                        presigned_url_list.append(presigned_url)
+                    else:
+                        presigned_url_list.append({})
+                except:
+                    presigned_url_list.append({})
+        return jsonify({"presigned_urls": presigned_url_list}), 200
 
-        return jsonify({"presigned_urls": presigned_urls})
     except Exception as err:
-        logger.error(err)
-        return jsonify({"error": "Something Went wrong while generating URL"})
+        logger.error(f"An error occurred while generating presigned URL: {err}")
+        return jsonify({"error": "An error occurred while generating presigned URL."}), 500

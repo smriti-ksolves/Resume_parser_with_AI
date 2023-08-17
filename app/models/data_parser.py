@@ -25,18 +25,18 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 def Data_Parser(data):
     """
-     Parse resume data using OpenAI's text generation engine.
+    Parse resume data using OpenAI's text generation engine.
 
-     This function takes resume data as input and generates a prompt for extracting various details
-     such as name, email, phone number, skills, etc., using OpenAI's text-davinci-003 engine. The parsed
-     data is returned in JSON format.
+    This function takes resume data as input and generates a prompt for extracting various details
+    such as name, email, phone number, skills, etc., using OpenAI's text-davinci-003 engine. The parsed
+    data is returned in JSON format.
 
-     Args:
-         data (str): The resume data to be parsed.
+    Args:
+        data (str): The resume data to be parsed.
 
-     Returns:
-         str: Parsed resume data in JSON format.
-     """
+    Returns:
+        str: Parsed resume data in JSON format.
+    """
     try:
         # Construct the prompt with instructions for extracting details
         prompt_file = open(r"app/db/prompt.txt")
@@ -58,18 +58,21 @@ def Data_Parser(data):
                 break  # If successful, break the loop
             except openai.error.OpenAIError as e:
                 if "rate_limit_exceeded" in str(e):
-                    wait_time = 20  # seconds
-                    logger.info(f"Rate limit exceeded. Waiting for {wait_time} seconds...")
-                    time.sleep(wait_time)
+                    logger.info("Rate limit exceeded. Waiting for a moment before retrying...")
+                    time.sleep(20)  # Wait for a moment before retrying
+                elif "You exceeded your current quota" in str(e):
+                    logger.error("Exceeded OpenAI API quota. Please check your plan and billing details.")
+                    return {"error": "Exceeded OpenAI API quota. Please check your plan and billing details."}
                 else:
                     logger.error(e)
+                    return {"error": str(e)}
+
         parsed_data = parsed_data.choices[0].text  # Extract the generated text from the response
         return parsed_data
+
     except Exception as err:
-        msg = ""
         logger.error(err)
-        # msg = Data_Parser(data)  # Recursively call the function in case of errors
-        return msg
+        return {"error": f"An error occurred while parsing: {err}"}
 
 
 def clean_name(name):
@@ -112,6 +115,10 @@ def response_validation(response):
 
         return filtered_data
 
+    except (IndexError, KeyError, SyntaxError) as err:
+
+        logger.error(f"Error during response validation: {err}")
+
     except Exception as err:
-        logger.error(err)
+        logger.error(f"An unexpected error occurred during response validation: {err}")
         return data  # Return data even if an exception occurs (for error handling)

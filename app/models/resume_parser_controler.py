@@ -25,16 +25,25 @@ def get_extracted_data(params):
 
             # Extract text data from the PDF file
             text_data = extract_text_from_pdf(file_obj, folder)
+            if "error" in text_data:
+                return text_data
 
             # Parse the extracted text data
             res = Data_Parser(text_data)
+            if "error" in res:
+                return res
 
             # Validate and filter the parsed response
             response = response_validation(res)
+            if response:
+                # Remove the local PDF file
+                os.remove(file_obj)
 
-            # Remove the local PDF file
-            os.remove(file_obj)
-
-            return response  # Return the processed response
+                return response  # Return the processed response
+            else:
+                return {"error": "Error during response validation"}
         except Exception as err:
             logger.error(err)
+            return {"error": "An error occurred during processing."}
+
+    return {"error": "No files found for processing."}

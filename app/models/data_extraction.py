@@ -23,6 +23,8 @@ def extract_text_from_pdf(file_name, folder_name):
 
     # Get the PDF file from the S3 bucket using the provided function get_file()
     response = get_file(file_name, bucket_name, folder_name)
+    if "error" in response:
+        return response
     logger.info("Pdf Data Extraction Started")
     try:
         # Open the PDF file using pdfplumber
@@ -32,3 +34,4 @@ def extract_text_from_pdf(file_name, folder_name):
             return text  # Return the extracted text
     except Exception as err:
         logger.error(err)
+        return {"error": "PDF text extraction failed."}
