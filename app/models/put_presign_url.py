@@ -21,12 +21,13 @@ def generate_presigned_url(bucket_name, object_key, expiration=3600):
     """
     try:
         # Generate a presigned URL using the 'put_object' action
-        presigned_post = s3_client.generate_presigned_post(
-            Bucket=bucket_name,
-            Key=object_key,
+        presigned_url = s3_client.generate_presigned_url(
+            'put_object',
+            Params={'Bucket': bucket_name, 'Key': object_key},
             ExpiresIn=expiration,
+            HttpMethod='PUT'
         )
-        return presigned_post
+        return presigned_url
 
     except botocore.exceptions.ClientError as e:
         logger.error(e)
