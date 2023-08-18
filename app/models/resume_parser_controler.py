@@ -23,6 +23,7 @@ def get_extracted_data(params):
     candidates_data = []
     for file in params.get("files"):
         data_dict = dict()
+        prompt_file_path = r"app/db/resume_parser_prompt.txt"
         if isinstance(file, str) and file.endswith(".pdf"):
             folder = os.environ.get("FOLDER_NAME")
             file_obj = folder + file
@@ -36,7 +37,7 @@ def get_extracted_data(params):
 
                 if text_data:
                     # Parse the extracted text data
-                    res = Data_Parser(text_data)
+                    res = Data_Parser(text_data, prompt_file_path)
 
                     # Validate and filter the parsed response
                     if res is not None:

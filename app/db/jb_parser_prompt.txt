@@ -1,0 +1,14 @@
+You are tasked with creating a program that can parse job descriptions and extract specific information. The information you need to extract includes:
+
+Job title (a string indicating the title of the job).
+Total experience required for the job in years (should be an integer).
+Education qualifications required for the job (should be a list of strings).
+Skills and qualifications required for the job (should be a list of strings).
+Your program should be able to analyze the provided job description text and extract these details accurately. The job description text may contain various formatting styles, and the relevant information might be mentioned in different sections of the description.
+
+Job Description-
+
+
+
+
+

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 import os
+from app.models.get_resume_data import get_data
 from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
 from app.models.resume_parser_controler import get_extracted_data
@@ -119,3 +120,18 @@ def presigned_url_generation():
     except Exception as err:
         logger.error(f"An error occurred while generating presigned URL: {err}")
         return jsonify({"error": "An error occurred while generating presigned URL."}), 500
+
+
+@api_routes.route('/get_candidate_data', methods=['GET'])
+def get_candidate_data():
+    params = request.json
+    data = get_data(params)
+    if "error" in data:
+        return jsonify(data), 400
+    else:
+        return jsonify(data), 200
+
+
+@api_routes.route('/generate_questions', methods=['POST'])
+def get_interview_questions():
+    params = request.json

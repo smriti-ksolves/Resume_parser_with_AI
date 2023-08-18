@@ -23,7 +23,8 @@ load_dotenv(dotenv_path)
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
-def Data_Parser(data):
+def Data_Parser(data, prompt_file_path):
+
     """
     Parse resume data using OpenAI's text generation engine.
 
@@ -39,7 +40,7 @@ def Data_Parser(data):
     """
     try:
         # Read the prompt instructions from a file
-        with open(r"app/db/prompt.txt") as prompt_file:
+        with open(prompt_file_path) as prompt_file:
             prompt = prompt_file.read()
 
         # Construct the prompt by appending data
