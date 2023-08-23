@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 import os
 from app.models.get_resume_data import get_data, delete_candidate_row
-from app.models.questions_generator import question_validator_and_gererator
+from app.models.questions_generator import question_validator_and_generator
 from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
 from app.models.resume_parser_controler import get_extracted_data
@@ -11,7 +11,6 @@ from app.app import logger
 from functools import wraps
 import jwt
 from app.app import flask_app
-
 api_routes = Blueprint('api', __name__)
 
 
@@ -35,6 +34,7 @@ def token_required(f):
             return jsonify({'error': 'Token is missing!'}), 401
         try:
             data = jwt.decode(token, flask_app.config['SECRET_KEY'], algorithms=['HS256'])
+
         except jwt.ExpiredSignatureError:
             return jsonify({'error': 'Token has expired!'}), 401
         except jwt.InvalidTokenError:
@@ -198,8 +198,40 @@ def delete_row(candidate_id):
 @api_routes.route('/generate_questions', methods=['POST'])
 @token_required
 def get_interview_quest():
+    """
+        Generate Interview Questions API Endpoint.
+
+        This endpoint generates interview questions based on the provided parameters.
+
+        Endpoint: POST /generate_questions
+
+        Requires a valid JWT token for authentication.
+
+        Args:
+            None
+
+        Returns:
+            tuple: A tuple containing the JSON response data and the HTTP status code.
+
+            Response Format:
+            {
+                "question": "What is the correct syntax for defining a function in Python?",
+                "options": [
+                    "func();",
+                    "def func();",
+                    "funct() ->",
+                    "def funct;"
+                ],
+                "answer": 1
+            }
+
+            Status Codes:
+            - 200 OK: Successful request.
+            - 400 Bad Request: Invalid input or error occurred during processing.
+            - 401 Unauthorized: Token is missing or invalid.
+    """
     params = request.json
-    data = question_validator_and_gererator(params)
+    data = question_validator_and_generator(params)
     if "error" in data:
         return jsonify(data), 400
     return jsonify(data), 200
