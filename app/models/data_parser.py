@@ -24,7 +24,6 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 def Data_Parser(data, prompt_file_path):
-
     """
     Parse resume data using OpenAI's text generation engine.
 
@@ -44,7 +43,10 @@ def Data_Parser(data, prompt_file_path):
             prompt = prompt_file.read()
 
         # Construct the prompt by appending data
-        prompt += data[:6000]
+        if len(data) > 6000:
+            prompt += data[:6000]
+        else:
+            prompt += data
 
         # Make a request to OpenAI's text-davinci-003 engine
         parsed_data = openai.Completion.create(

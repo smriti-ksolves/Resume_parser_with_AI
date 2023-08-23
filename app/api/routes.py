@@ -1,12 +1,16 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 import os
-from app.models.get_resume_data import get_data
+from app.models.get_resume_data import get_data, delete_candidate_row
+from app.models.questions_generator import question_validator_and_gererator
 from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
 from app.models.resume_parser_controler import get_extracted_data
 from app.models.put_presign_url import generate_presigned_url
 from app.app import logger
+from functools import wraps
+import jwt
+from app.app import flask_app
 
 api_routes = Blueprint('api', __name__)
 
@@ -20,6 +24,25 @@ def index():
     }
     logger.info("Server Running!")
     return jsonify(data)
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+
+        if not token:
+            return jsonify({'error': 'Token is missing!'}), 401
+        try:
+            data = jwt.decode(token, flask_app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token has expired!'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token!'}), 401
+
+        return f(*args, **kwargs)
+
+    return decorated
 
 
 @api_routes.route('/signup', methods=['POST'])
@@ -72,6 +95,7 @@ def signin():
 
 
 @api_routes.route('/get_parsed_data', methods=['POST'])
+@token_required
 def resume_parsing():
     """
       Endpoint for parsing resumes and creating JSON data.
@@ -98,6 +122,7 @@ def resume_parsing():
 
 
 @api_routes.route('/get_presigned_url', methods=['POST'])
+@token_required
 def presigned_url_generation():
     folder_name = os.environ.get("FOLDER_NAME")
     bucket_name = os.environ.get("S3_BUCKET_NAME")
@@ -123,15 +148,58 @@ def presigned_url_generation():
 
 
 @api_routes.route('/get_candidate_data', methods=['GET'])
+@token_required
 def get_candidate_data():
-    params = request.json
-    data = get_data(params)
+    """
+    API endpoint to retrieve candidate data based on user_id and email.
+
+    This API endpoint expects query parameters "user_id" and "email".
+    The function get_data is called to retrieve candidate data.
+
+    Returns:
+        JSON response containing candidate data or error message.
+    """
+    user_id = request.args.get('user_id')
+    email = request.args.get('email')
+    data = get_data(user_id, email)
+
     if "error" in data:
+        logger.error(data)
         return jsonify(data), 400
+
     else:
         return jsonify(data), 200
 
 
+@api_routes.route('/delete_candidate_record/<candidate_id>', methods=['DELETE'])
+@token_required
+def delete_row(candidate_id):
+    """
+    API endpoint to delete a candidate record.
+
+    This API endpoint receives a JSON payload containing the "candidate_id" to be deleted.
+    The function delete_candidate_row is called to perform the deletion.
+
+    Returns:
+        JSON response indicating success or error.
+    """
+    try:
+        candidate_id = int(candidate_id)  # Convert to integer
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid candidate_id"}), 400
+    res = delete_candidate_row(candidate_id)
+    if "error" in res:
+        logger.error(res)
+        return jsonify(res), 400
+    else:
+        return jsonify(res), 200
+
+
 @api_routes.route('/generate_questions', methods=['POST'])
-def get_interview_questions():
+@token_required
+def get_interview_quest():
     params = request.json
+    data = question_validator_and_gererator(params)
+    if "error" in data:
+        return jsonify(data), 400
+    return jsonify(data), 200

@@ -1,0 +1,17 @@
+
+
+Prepare interview questions based on the candidate's skills and experiences. Ensure you follow these steps:
+
+1. Begin by asking the candidate to provide a brief introduction about themselves and mention the number of years of experience they have with their current company.
+
+2. Then, have them describe one of their recent projects in detail. Ask about their role and responsibilities in that project.
+
+3. Moving on to their skills, structure your questions to explore each skill at a deeper level. Remember not to ask directly about the skill, but come up with creative and probing questions that allow the candidate to showcase their understanding and experience.
+
+4. Encourage the candidate to provide comprehensive answers, offering valuable context about their skills.
+
+Remember, the goal is to gain insights into their expertise without directly asking for it. Feel free to adapt the questions based on the specific skills and roles of the candidates.
+
+and the most important thing you should provide me python json format and questions should be in list like this --{"questions":[list of questions]}
+
+Candidate Data: -

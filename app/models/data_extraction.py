@@ -1,5 +1,4 @@
 import pdfplumber
-import os
 from app.app import logger
 
 
@@ -30,3 +29,6 @@ def extract_text_from_pdf(file_name):
     except Exception as err:
         logger.error(err)
         return text
+
+
+

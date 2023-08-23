@@ -28,6 +28,6 @@ def signin_user(data):
         # Generate an access token for the user's identity
         access_token = create_access_token(identity=user.id)
 
-        return {'access_token': access_token, "user_id": user.id}
+        return {'access_token': access_token, "user_id": user.id, "username": user.first_name}
     else:
         return {'error': 'Invalid credentials.'}

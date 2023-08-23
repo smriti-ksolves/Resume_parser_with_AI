@@ -1,0 +1,27 @@
+Generate a set of multiple-choice questions to assess candidates' knowledge. Each question should include multiple options, with one correct answer and three distractors.
+
+Please provide a list of questions and options in the following format:
+
+[
+    {
+        "question": "Enter your multiple-choice question here.",
+        "options": ["Option A", "Option B", "Option C", "Option D"],
+        "answer": 0
+    },
+    {
+        "question": "Enter another multiple-choice question here.",
+        "options": ["Option A", "Option B", "Option C", "Option D"],
+        "answer": 1
+    },
+    {
+        "question": "Enter a third multiple-choice question here.",
+        "options": ["Option A", "Option B", "Option C", "Option D"],
+        "answer": 2
+    }
+]
+
+For each question, specify the correct answer index (0-based) among the provided options.
+
+Feel free to replace the placeholder text with actual multiple-choice questions, options, and correct answer indices.
+
+params:-
