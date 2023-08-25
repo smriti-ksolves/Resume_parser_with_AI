@@ -11,7 +11,7 @@ pattern = regex.compile(r'\{(?:[^{}]|(?R))*\}')
 
 # Define a list of keys for the filtered data
 my_keys = ['name', 'email_id', 'phone_no', 'total_experience', 'current_employer', 'current_designation', 'skills',
-           'current_skills', 'location']
+           'current_skills', 'location', 'project_names', 'company_count']
 
 # Construct the path to the .env file
 dotenv_path = os.path.join(os.getcwd(), '.env')
@@ -47,7 +47,6 @@ def Data_Parser(data, prompt_file_path):
             prompt += data[:6000]
         else:
             prompt += data
-
         # Make a request to OpenAI's text-davinci-003 engine
         parsed_data = openai.Completion.create(
             engine="text-davinci-003",

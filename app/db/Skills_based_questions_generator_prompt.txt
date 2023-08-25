@@ -1,7 +1,6 @@
-Generate a set of multiple-choice questions to assess candidates' knowledge. Each question should include multiple options, with one correct answer and three distractors.
+Compose a set of questions that delve into the nuances of candidates' knowledge. The questions should be tailored to individuals with a solid grasp of [specific skills/experience]. Each question should feature [question counts] options, encompassing one accurate answer and three strategically designed distractors.
 
-Please provide a list of questions and options in the following format:
-
+Kindly generate the questions and options in the subsequent format, ensuring a suitable level of complexity:
 [
     {
         "question": "Enter your multiple-choice question here.",

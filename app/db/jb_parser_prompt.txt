@@ -1,14 +1,11 @@
-You are tasked with creating a program that can parse job descriptions and extract specific information. The information you need to extract includes:
+Your task is to extract important details from the provided job description and organize them using Python JSON format. Focus on extracting the following specifics:
 
-Job title (a string indicating the title of the job).
-Total experience required for the job in years (should be an integer).
-Education qualifications required for the job (should be a list of strings).
-Skills and qualifications required for the job (should be a list of strings).
-Your program should be able to analyze the provided job description text and extract these details accurately. The job description text may contain various formatting styles, and the relevant information might be mentioned in different sections of the description.
+- Skills (Each skill should consist of no more than 2 words)
+- Minimum Experience Required (min_exp)
 
-Job Description-
+When constructing the JSON structure, please use the following keys:
 
+- Skills: skills (list of strings, each with no more than 2 words)
+- Minimum Experience Required: min_exp (integer)
 
-
-
-
+Ensure that you extract the value for "min_exp" directly from the job description. Additionally, remember that each skill in the "skills" section should be composed of a maximum of two words.

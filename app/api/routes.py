@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 import os
 from app.models.get_resume_data import get_data, delete_candidate_row
-from app.models.questions_generator import question_validator_and_generator
+from app.models.questions_generator import question_validator_and_generator, jd_parser
 from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
 from app.models.resume_parser_controler import get_extracted_data
@@ -10,7 +10,9 @@ from app.models.put_presign_url import generate_presigned_url
 from app.app import logger
 from functools import wraps
 import jwt
+import time
 from app.app import flask_app
+
 api_routes = Blueprint('api', __name__)
 
 
@@ -111,10 +113,13 @@ def resume_parsing():
           dict: A JSON response containing the result of the parsing and JSON data creation process.
       """
     try:
+        start_time = time.time()
         params = request.json
         data = get_extracted_data(params)
-
-        return jsonify(data), 200
+        end_time = time.time()
+        processing_time = end_time - start_time
+        logger.info(f"Processing Time for {len(data)} - resume parsing is {processing_time}")
+        return jsonify({"data": data, "processing_time": processing_time}), 200
 
     except Exception as e:
         logger.error(e)
@@ -235,3 +240,16 @@ def get_interview_quest():
     if "error" in data:
         return jsonify(data), 400
     return jsonify(data), 200
+
+
+@api_routes.route('/JD_Parser', methods=['POST'])
+@token_required
+def get_jb_data():
+    try:
+        params = request.json
+        data = jd_parser(params)
+        if "error" in data:
+            return jsonify(data), 400
+        return jsonify(data), 200
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
