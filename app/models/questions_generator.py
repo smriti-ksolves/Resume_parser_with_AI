@@ -86,9 +86,11 @@ def get_questions(params):
         if "skills" in params:
             skills = params.get("skills")
             question_cnt = params.get("question_count", 5)
+            exp = params.get("experience", 1)
             constructed_params = {
                 "skills": skills,
-                "question_count": question_cnt
+                "question_count": question_cnt,
+                "Experience": exp
             }
             data = Data_Parser(str(constructed_params), prompt_path)
             if data is not None:
@@ -195,9 +197,16 @@ def question_validator_and_generator(params):
         logger.error(str(err))
         return {"error": str(err)}
 
-# def jp_parser(jb_data):
-#     jb_prompt_path = r"app/db/jb_parser_prompt.txt"
-#     data = Data_Parser(jb_data, jb_prompt_path)
+
+def jd_parser(params):
+    jb_data = params.get("JD_Des")
+    jd_prompt_path = r"app/db/jb_parser_prompt.txt"
+    data = Data_Parser(jb_data, jd_prompt_path)
+    if data is not None:
+        data = eval(pattern.findall(data)[0])
+        return data
+    else:
+        return {"error":  "Error While parsing the data"}
 #
 #
 # def prepare_questions(candidate_data):

@@ -1,43 +1,70 @@
 Please extract the following details from the provided resume text and present them in Python JSON format:
-            - Name
-            - Email ID
-            - Phone Number
-            - Location
-            - Total Experience (expressed in years)
-            - Current Employer (Identify the candidate's most recent workplace, focusing on keywords like "Current Employer," "Recent Job," or "Present Company")
-            - Current Designation
-            - Skills
-            - Current Skills
+- Name
+- Email ID
+- Phone Number
+- Location
+- Total Experience (expressed in years)
+- Current Employer (Identify the candidate's most recent workplace, focusing on keywords like "Current Employer," "Recent Job," or "Present Company")
+- Current Designation
+- Skills (list of strings, each with no more than 2 words)
+- Current Skills (list of strings, each with no more than 2 words)
+- Project Names
+- Company Count
 
-            For each detail, please use the following keys in the JSON:
-            - Name: name (string)
-            - Email ID: email_id (string)
-            - Phone Number: phone_no (string)
-            - Location: location (string)
-            - Total Experience: total_experience (integer in years)
-            - Current Employer: current_employer (string)
-            - Current Designation: current_designation (string)
-            - Skills: skills (list of strings)
-            - Current  Skills: current_skills (list of strings)
+For each detail, please use the following keys in the JSON:
+- Name: name (string)
+- Email ID: email_id (string)
+- Phone Number: phone_no (string)
+- Location: location (string)
+- Total Experience: total_experience (integer in years)
+- Current Employer: current_employer (string)
+- Current Designation: current_designation (string)
+- Skills: skills (list of strings, each with no more than 2 words)
+- Current Skills: current_skills (list of strings, each with no more than 2 words)
+- Project Names: project_names (list of strings)
+- Company Count: company_count (integer)
 
-            To improve the accuracy of extracting the "name" field, follow these strategies:
-                1. Search for sections or lines that may contain personal information, such as "Personal Details," "Contact Information," or "Profile."
-                2. Extract the text from these sections and analyze patterns that typically represent names.
-                3. Use regular expressions to match common name patterns, while considering the presence of special characters and diacritics.
-                4. Normalize Unicode characters (e.g., NFKD) to handle diacritics and special characters effectively.
-           To improve the accuracy of extracting the "Current Employer," follow these strategies:
-                1. Locate sections or headings related to work experience, such as "Work History," "Employment," or "Professional Experience."
-                2. Extract the text within these sections and capture the surrounding context, including job titles and date ranges.
-                3. Search for specific keywords like "Current Employer," "Present Company," or "Recent Job" within these sections.
-                4. Account for formatting variations using regular expressions to match potential variations of the keywords.
-                5. Be cautious with keywords like "LinkedIn" which might be present in contexts other than current employment. Consider filtering out these false positives by checking adjacent job titles and date ranges.
-                6. Utilize multiple context clues, such as adjacent job titles and date ranges, to accurately identify the current employer.
+To improve the accuracy of extracting the "name" field, follow these strategies:
+1. Search for sections or lines that may contain personal information, such as "Personal Details," "Contact Information," or "Profile."
+2. Extract the text from these sections and analyze patterns that typically represent names.
+3. Use regular expressions to match common name patterns, while considering the presence of special characters and diacritics.
+4. Normalize Unicode characters (e.g., NFKD) to handle diacritics and special characters effectively.
 
-            To extract the candidate's "Current Skills":
-                1. Focus on the work experience sections related to the identified current employer.
-                2. Identify keywords or phrases that indicate skills, such as "Skills," "Technologies Used," or similar headings.
-                3. Extract the text within these sections and parse for relevant skills.
+To improve the accuracy of extracting the "Current Employer," follow these strategies:
+1. Locate sections or headings related to work experience, such as "Work History," "Employment," or "Professional Experience."
+2. Extract the text within these sections and capture the surrounding context, including job titles and date ranges.
+3. Search for specific keywords like "Current Employer," "Present Company," or "Recent Job" within these sections.
+4. Account for formatting variations using regular expressions to match potential variations of the keywords.
+5. Be cautious with keywords like "LinkedIn" which might be present in contexts other than current employment. Consider filtering out these false positives by checking adjacent job titles and date ranges.
+6. Utilize multiple context clues, such as adjacent job titles and date ranges, to accurately identify the current employer.
 
-            When identifying the current employer, focus on sections explicitly related to work experience. Exclude comments in the JSON output. Provide only JSON data.
+To accurately extract the candidate's "Current Skills":
+1. Focus on the work experience sections related to the identified current employer.
+2. Identify keywords or phrases that indicate skills, such as "Skills," "Technologies Used," or similar headings.
+3. Extract the text within these sections and parse for relevant skills. Each extracted skill should consist of at most two words.
 
-            Resume:-
+To extract project names:
+1. Locate sections that explicitly discuss projects or personal project experiences.
+2. Extract the relevant text within these sections and identify project details, including names.
+3. Include projects from diverse contexts, encompassing work experiences, internships, and academic endeavors.
+4. Ensure that the extracted projects align with the definition of a project—a temporary endeavor aimed at producing a distinct and unique product, service, or result.
+5. Assemble a list of distinct project names, each reflecting the individuality and purpose of the project.
+6. Exclude phrases resembling skills, technologies, or methodologies from the extracted project names.
+7. Strive to encapsulate the distinctiveness of each project in its name, highlighting the tangible outcome achieved.
+
+To provide a comprehensive overview of the candidate's professional journey, including job roles, tenures, and project contributions, we will calculate the total count of distinct companies they have been associated with. Follow these steps:
+1. Identify sections detailing work experience, such as "Work History," "Employment," or "Professional Experience."
+2. Extract text from these sections to discern past and current job roles, tenure periods, and project details.
+3. Assemble a list of unique company names, considering their associated job titles, working timelines, and project involvements.
+4. Exclude college degrees that are still being pursued from the company count.
+5. Count the number of distinct companies in the list.
+6. This count signifies the candidate's "Company Count," offering insights into their diverse roles, tenures, and project scopes, while omitting ongoing college degrees.
+
+For the JSON output, structure the "Company Count" as follows:
+- Company Count: company_count (integer)
+
+When determining the current employer, current skills, project names, and company count, focus on sections directly relevant to work experiences and projects. Exclude comments from the JSON output. Present only JSON data.
+
+Resume:
+
+

@@ -28,12 +28,23 @@ def get_data(user_id: int, email: str, id_list: list = []):
 
         if not id_list:
             candidate_data_objects = resume_data.query.filter_by(user_id=user_id, email=email).order_by(
-                resume_data.created_at.desc()).with_entities(resume_data.id, resume_data.candidate_data).all()
+                resume_data.created_at.desc()).with_entities(resume_data.id, resume_data.candidate_data,
+                                                             resume_data.created_at).all()
         else:
             candidate_data_objects = resume_data.query.filter_by(user_id=user_id, email=email).filter(
                 resume_data.id.in_(id_list)).order_by(
-                resume_data.created_at.desc()).with_entities(resume_data.id, resume_data.candidate_data).all()
-        candidate_data_list = [{"candidate_id": data[0], "candidate_data": data[1]} for data in candidate_data_objects]
+                resume_data.created_at.desc()).with_entities(resume_data.id, resume_data.candidate_data, resume_data.created_at).all()
+        candidate_data_list = [
+            {
+                "candidate_id": data[0],
+                "candidate_data": data[1],
+                "created_at": {
+                    "date": data[2].date().isoformat(),
+                    "time": data[2].time().strftime("%H:%M:%S")
+                }
+            }
+            for data in candidate_data_objects
+        ]
         return candidate_data_list
 
     except Exception as e:
