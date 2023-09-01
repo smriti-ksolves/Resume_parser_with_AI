@@ -13,4 +13,9 @@ class login_user(db.Model):
     org_name = db.Column(db.String(120), nullable=False)
     org_address = db.Column(db.String(50), nullable=False)
     no_of_emp = db.Column(db.String(120), nullable=False)
+    # New fields for email verification
+    verification_token = db.Column(db.String(100), unique=True)
+    email_verified = db.Column(db.Boolean, default=False)
+    verification_token_expiry = db.Column(db.DateTime)
+
 

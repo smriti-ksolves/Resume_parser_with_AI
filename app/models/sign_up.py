@@ -1,5 +1,7 @@
 from app.app import flask_app, db, bcrypt
 from app.db.user_model import login_user
+from app.helper.mail_vertification import generate_verification_token, send_verification_email
+from datetime import datetime, timedelta
 
 
 def signup_user(params):
@@ -43,13 +45,19 @@ def signup_user(params):
     # Hash the password
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
+    # Generate a verification token and calculate expiration time
+    verification_token = generate_verification_token()
+    verification_token_expiry = datetime.utcnow() + timedelta(hours=24)  # Set an expiration time (e.g., 24 hours)
+
     # Create a new user instance
     new_user = login_user(first_name=first, last_name=last, username=username, email=email, phone_number=phone_number,
                           country=country, password=hashed_password, org_name=org_name, org_address=org_address,
-                          no_of_emp=no_emp)
+                          no_of_emp=no_emp, verification_token=verification_token,
+                          verification_token_expiry=verification_token_expiry)
 
     # Add the user to the database
     db.session.add(new_user)
     db.session.commit()
-
+    # Send verification email (you'll need to implement the send_verification_email function)
+    send_verification_email(email, verification_token)
     return {'message': 'User created successfully.'}

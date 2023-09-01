@@ -23,6 +23,7 @@ For each detail, please use the following keys in the JSON:
 - Current Skills: current_skills (list of strings, each with no more than 2 words)
 - Project Names: project_names (list of strings)
 - Company Count: company_count (integer)
+- Company Names: company_names (list of strings)
 
 To improve the accuracy of extracting the "name" field, follow these strategies:
 1. Search for sections or lines that may contain personal information, such as "Personal Details," "Contact Information," or "Profile."
@@ -52,19 +53,35 @@ To extract project names:
 6. Exclude phrases resembling skills, technologies, or methodologies from the extracted project names.
 7. Strive to encapsulate the distinctiveness of each project in its name, highlighting the tangible outcome achieved.
 
-To provide a comprehensive overview of the candidate's professional journey, including job roles, tenures, and project contributions, we will calculate the total count of distinct companies they have been associated with. Follow these steps:
+To provide a comprehensive overview of the candidate's professional journey, encompassing job roles, tenures, project contributions, and remote work experiences, we will calculate the total count of distinct companies they have been associated with. Follow these steps:
+
 1. Identify sections detailing work experience, such as "Work History," "Employment," or "Professional Experience."
-2. Extract text from these sections to discern past and current job roles, tenure periods, and project details.
-3. Assemble a list of unique company names, considering their associated job titles, working timelines, and project involvements.
-4. Exclude college degrees that are still being pursued from the company count.
-5. Count the number of distinct companies in the list.
-6. This count signifies the candidate's "Company Count," offering insights into their diverse roles, tenures, and project scopes, while omitting ongoing college degrees.
+2. Extract text from these sections to discern past and current job roles, tenure periods, project details, and any mentions of remote work.
+3. Assemble a list of unique company names, considering their associated job titles, working timelines, project involvements, and remote work context.
+4. Exclude ongoing college degrees and educational institutions from the company count.
+5. Count the number of distinct companies in the list, encompassing both in-person and remote work experiences.
+6. This count signifies the candidate's "Company Count," offering insights into their diverse roles, tenures, project scopes, remote work engagements, and the names of the associated companies.
 
-For the JSON output, structure the "Company Count" as follows:
+In the JSON output, structure the "Company Count" and "Company Names" as follows:
 - Company Count: company_count (integer)
+- Company Names: company_names (list of strings)
 
-When determining the current employer, current skills, project names, and company count, focus on sections directly relevant to work experiences and projects. Exclude comments from the JSON output. Present only JSON data.
+To provide an accurate calculation of the candidate's total experience, it is crucial to exercise caution and avoid errors. Follow these steps:
+
+1. Identify sections related to work experience, such as "Work History," "Employment," or "Professional Experience."
+2. Extract text from these sections to discern job start and end dates, including month and year.
+3. Calculate the duration of each job by subtracting the start date from the end date, accounting for differences in months and years.
+4. Sum up the durations of all jobs to obtain the candidate's total work experience, considering both full-time and part-time roles.
+5. Exclude college degrees that are still being pursued from the total experience calculation.
+
+Ensure the following while calculating the "Total Experience":
+- Account for overlapping job periods, if applicable.
+- Consider remote work engagements as part of the total experience.
+- Use caution to avoid counting duplicate or overlapping time spans.
+
+In the JSON output, structure the "Total Experience" as follows:
+- Total Experience: total_experience (float, rounded to 1 decimal place)
+
+When identifying the current employer, current skills, project names, company names, and company count, focus on sections directly relevant to work experiences and projects. Exclude comments from the JSON output. Present only JSON data.
 
 Resume:
-
-

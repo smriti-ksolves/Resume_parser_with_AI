@@ -65,5 +65,5 @@ def get_extracted_data(params):
                 if os.path.exists(file_obj):
                     os.remove(file_obj)
         else:
-            candidates_data.append({file: {"error": "Please upload valid file"}})
+            candidates_data.append({file: {"error": "Please upload pdf only under 50 kb"}})
     return candidates_data

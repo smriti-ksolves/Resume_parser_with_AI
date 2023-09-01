@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 import boto3
+from flask_mail import Mail, Message
+
 
 dotenv_path = os.path.join(os.getcwd(), '.env')
 load_dotenv(dotenv_path)
@@ -52,3 +54,18 @@ s3_client = boto3.client('s3', aws_access_key_id=access_key,
                          aws_secret_access_key=access_secret,
                          region_name=region
                          )
+
+
+flask_app.config["HOST_NAME"] = os.getenv("HOST_NAME")
+flask_app.config["PORT"] = os.getenv("PORT")
+
+# Add these lines to your app configuration
+flask_app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER") # Your email server's SMTP server
+flask_app.config['MAIL_PORT'] = os.getenv("mail_port")  # SMTP port
+flask_app.config['MAIL_USE_TLS'] = os.getenv("mail_use_tls")  # Use TLS for secure connection
+flask_app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+flask_app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+flask_app.config['MAIL_DEFAULT_SENDER'] = os.getenv("mail_default_sender")  # Default sender address
+
+
+mail = Mail(flask_app)
