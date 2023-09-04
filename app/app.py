@@ -7,7 +7,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 import boto3
 from flask_mail import Mail, Message
-
+from sendgrid import SendGridAPIClient
 
 dotenv_path = os.path.join(os.getcwd(), '.env')
 load_dotenv(dotenv_path)
@@ -61,11 +61,16 @@ flask_app.config["PORT"] = os.getenv("PORT")
 
 # Add these lines to your app configuration
 flask_app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER") # Your email server's SMTP server
-flask_app.config['MAIL_PORT'] = os.getenv("mail_port")  # SMTP port
-flask_app.config['MAIL_USE_TLS'] = os.getenv("mail_use_tls")  # Use TLS for secure connection
+flask_app.config['MAIL_PORT'] = os.getenv("MAIL_PORT")  # SMTP port
+flask_app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS")  # Use TLS for secure connection
 flask_app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
 flask_app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
-flask_app.config['MAIL_DEFAULT_SENDER'] = os.getenv("mail_default_sender")  # Default sender address
-
+flask_app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER")  # Default sender address
+flask_app.config['PUBLIC_URL'] = os.getenv("PUBLIC_URL")
 
 mail = Mail(flask_app)
+
+flask_app.config['SENDGRID_API_KEY'] = os.getenv("sendgrid_api_key")
+sg = SendGridAPIClient(flask_app.config['SENDGRID_API_KEY'])
+
+

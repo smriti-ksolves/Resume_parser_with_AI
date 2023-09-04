@@ -63,7 +63,7 @@ def verify_email():
     user.verification_token = None  # Clear the token after verification
     db.session.commit()
 
-    return jsonify({'message': 'Email verified successfully.'})
+    return jsonify({'success': 'Email verified successfully.'}), 200
 
 
 @api_routes.route('/signup', methods=['POST'])

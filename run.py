@@ -8,4 +8,4 @@ CORS(flask_app, supports_credentials=False)
 host_ip, port_ip = os.environ.get("HOST_NAME", '0.0.0.0'), os.environ.get("PORT", 6543)
 
 if __name__ == '__main__':
-    flask_app.run(host='0.0.0.0', port=int(port_ip))
+    flask_app.run(host=host_ip, port=int(port_ip))

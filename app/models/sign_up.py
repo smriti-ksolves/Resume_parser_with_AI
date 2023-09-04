@@ -58,6 +58,10 @@ def signup_user(params):
     # Add the user to the database
     db.session.add(new_user)
     db.session.commit()
+
     # Send verification email (you'll need to implement the send_verification_email function)
-    send_verification_email(email, verification_token)
-    return {'message': 'User created successfully.'}
+    res = send_verification_email(email, verification_token)
+    if res:
+        return {'success': 'User created successfully.'}
+    else:
+        return {'error': f"Error sending email"}

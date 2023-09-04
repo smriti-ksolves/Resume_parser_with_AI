@@ -11,4 +11,7 @@ Flask-Cors==4.0.0
 gunicorn==20.1.0
 boto3==1.28.24
 botocore==1.31.24
-sqlalchemy
+Flask-Mail==0.9.1
+sqlalchemy==2.0.19
+sendgrid==6.10.0
+
