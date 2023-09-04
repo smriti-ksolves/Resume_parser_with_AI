@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        .content-area{
+            flex-direction: column;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 50px;
+        }
+        .text-area{
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        p{
+            color: #a39b9b;
+        }
+        .btn-area a{
+            text-decoration: none;
+            color: white;
+            background-color: #29af54;
+            height: 35px;
+            width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <section class="sec-done">
+        <div class="content-area">
+            <div class="img-area">
+                <img src="/static/images/checked.png" alt="icon" width="80" height="80">
+            </div>
+            <div class="text-area">
+                <h1>
+                    Email Verifed Successfully
+                </h1>
+                <p>
+                    Takes 1-5minutes, please wait.
+                </p>
+            </div>
+            <div class="btn-area">
+                 <a href="{{ custom_url }}">
+                    Login
+                </a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

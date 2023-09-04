@@ -20,7 +20,7 @@ def send_verification_email(email, verification_token):
     # public_url = flask_app.config['PUBLIC_URL']
     base_url = os.getenv("BASE_URL")
     verification_link = rf"{base_url}verify_email?token={verification_token}"
-    subject = 'Confirm Your Email Address - HelpingHR'
+    subject = 'Welcome to HelpingHR - Verify Your Email Address'
     recipients = email
 
     message_body = f"Click the following link to verify your email: {verification_link}"
@@ -28,30 +28,17 @@ def send_verification_email(email, verification_token):
     # message = Message(subject=subject, recipients=recipients, body=message_body)
     # mail.send(message)
     # Create a SendGrid message
-    html_body = f"""
-          <!DOCTYPE html>
-          <html>
-          <head>
-              <title>Verify Your Email</title>
-          </head>
-          <body>
-              <p>Dear User,</p>
-              <p>Thank you for registering with HelpingHR. To complete your registration and start using our services, please click the button below to verify your email address:</p>
-              <p style="text-align: center;">
-                  <a href="{verification_link}" style="background-color: #007BFF; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
-              </p>
-              <p>If you did not sign up for HelpingHR, please disregard this email.</p>
-              <p>Thank you,</p>
-              <p>HelpingHR Team</p>
-          </body>
-          </html>
-          """
+    # Load the email template from the HTML file
+    with open("app/templates/mail_content.html", "r") as template_file:
+        email_content = template_file.read()
+    email_content = email_content.replace("{{ verification_link }}", verification_link)
+
     logger.info(f'{verification_link}')
     message = Mail(
-        from_email='smriti.tiwari@ksolves.com',  # Replace with your sender email
+        from_email='smt444441@gmail.com',  # Replace with your sender email
         to_emails=recipients,
         subject=subject,
-        html_content=html_body,
+        html_content=email_content,
     )
     # Send the email
     try:

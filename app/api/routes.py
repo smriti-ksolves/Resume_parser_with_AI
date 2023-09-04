@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from flask_cors import cross_origin
 import os
 from app.db.user_model import login_user
@@ -8,7 +8,7 @@ from app.models.sign_up import signup_user
 from app.models.sign_in import signin_user
 from app.models.resume_parser_controler import get_extracted_data
 from app.models.put_presign_url import generate_presigned_url
-from app.app import logger, db, mail
+from app.app import logger, db
 from functools import wraps
 import jwt
 import time
@@ -50,20 +50,22 @@ def token_required(f):
 
 @api_routes.route('/verify_email', methods=['GET'])
 def verify_email():
+    sign_url = os.getenv("SIGN_IN_URL")
+    sign_up_url = os.getenv("SIGN_UP_URL")
     token = request.args.get('token')
     if not token:
-        return jsonify({'error': 'Verification token is missing.'}), 400
+        return render_template('signup.html', custom_url=sign_up_url)
 
     user = login_user.query.filter_by(verification_token=token).first()
     if not user:
-        return jsonify({'error': 'Invalid verification token.'}), 400
+        return render_template('signup.html', custom_url=sign_up_url)
 
     # Mark the user's email as verified
     user.email_verified = True
     user.verification_token = None  # Clear the token after verification
     db.session.commit()
 
-    return jsonify({'success': 'Email verified successfully.'}), 200
+    return render_template('signin.html', custom_url=sign_url)
 
 
 @api_routes.route('/signup', methods=['POST'])

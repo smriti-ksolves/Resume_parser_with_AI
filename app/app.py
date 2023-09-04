@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def create_app():
     # Create the Flask application instance
-    server = Flask(__name__)
+    server = Flask(__name__, static_folder="static")
     # Register API routes
     return server
 
