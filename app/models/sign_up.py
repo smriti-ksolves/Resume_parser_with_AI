@@ -1,6 +1,6 @@
 from app.app import flask_app, db, bcrypt
 from app.db.user_model import login_user
-from app.helper.mail_vertification import generate_verification_token, send_verification_email
+from app.helper.mail_vertification import generate_verification_token, send_verification_email, resend_verification_email
 from datetime import datetime, timedelta
 
 
@@ -32,8 +32,13 @@ def signup_user(params):
     username = email.split('@')[0]
 
     # Check if email is already registered
-    if login_user.query.filter_by(email=email).first():
-        return {'error': 'Email is already registered.'}
+    existing_user = login_user.query.filter_by(email=email).first()
+    if existing_user:
+        if existing_user.email_verified:
+            return {'error': 'Email is already registered.'}
+        else:
+            # Resend verification email with a new token and update expiration time
+            return resend_verification_email(email)
 
     if login_user.query.filter_by(phone_number=phone_number).first():
         return {'error': 'Phone is already registered.'}
@@ -62,6 +67,8 @@ def signup_user(params):
     # Send verification email (you'll need to implement the send_verification_email function)
     res = send_verification_email(email, verification_token)
     if res:
-        return {'success': 'User created successfully.'}
+        return {'success': 'A verification email has been sent to your email address. Please check your inbox and '
+                           'spam folder.'}
+
     else:
         return {'error': f"Error sending email"}

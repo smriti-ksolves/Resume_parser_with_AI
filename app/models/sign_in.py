@@ -2,6 +2,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from app.app import jwt, bcrypt
 from app.db.user_model import login_user
 from datetime import datetime, timedelta
+from app.helper.mail_vertification import resend_verification_email
 
 
 def signin_user(data):
@@ -27,7 +28,7 @@ def signin_user(data):
     if user and bcrypt.check_password_hash(user.password, password):
         # Check if the email is verified
         if not user.email_verified:
-            return {'error': 'Email not verified. Please check your email for a verification link.'}
+            return resend_verification_email(email)
 
         # Check for expired verification tokens
         if user.verification_token_expiry and user.verification_token_expiry < datetime.utcnow():
