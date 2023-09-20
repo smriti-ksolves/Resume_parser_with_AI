@@ -9,6 +9,7 @@ from flask_mail import Message
 from app.app import flask_app, sg, db
 from sendgrid.helpers.mail import Mail
 from app.app import logger
+from flask import make_response, jsonify
 
 
 def generate_verification_token():
@@ -79,9 +80,9 @@ def resend_verification_email(email):
         # Send the new verification email
         res = send_verification_email(email, new_verification_token)
         if res:
-            return {'success': 'A new verification email has been sent to your email address. '
-                               'Please check your inbox and spam folder.'}
+            return make_response(jsonify({'error': 'Email not verified. Please check your email for a '
+                                                   'verification link.'}), 401)
         else:
-            return {'error': 'Error sending the new verification email.'}
+            return make_response(jsonify({'error': 'Error sending the new verification email.'}), 500)
     else:
-        return {'error': 'User not found.'}
+        return make_response(jsonify({'error': 'User not found.'}), 404)

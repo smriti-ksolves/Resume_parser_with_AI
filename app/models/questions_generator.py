@@ -199,14 +199,17 @@ def question_validator_and_generator(params):
 
 
 def jd_parser(params):
-    jb_data = params.get("JD_Des")
-    jd_prompt_path = r"app/db/jb_parser_prompt.txt"
-    data = Data_Parser(jb_data, jd_prompt_path)
-    if data is not None:
-        data = eval(pattern.findall(data)[0])
-        return data
-    else:
-        return {"error":  "Error While parsing the data"}
+    try:
+        jb_data = params.get("JD_Des")
+        jd_prompt_path = r"app/db/jb_parser_prompt.txt"
+        data = Data_Parser(jb_data, jd_prompt_path)
+        if data is not None:
+            data = eval(pattern.findall(data)[0])
+            return data
+        else:
+            return {"error":  "Error While parsing the data"}
+    except Exception as err:
+        return {"error": str(err)}
 #
 #
 # def prepare_questions(candidate_data):

@@ -33,7 +33,8 @@ def get_data(user_id: int, email: str, id_list: list = []):
         else:
             candidate_data_objects = resume_data.query.filter_by(user_id=user_id, email=email).filter(
                 resume_data.id.in_(id_list)).order_by(
-                resume_data.created_at.desc()).with_entities(resume_data.id, resume_data.candidate_data, resume_data.created_at).all()
+                resume_data.created_at.desc()).with_entities(resume_data.id, resume_data.candidate_data,
+                                                             resume_data.created_at).all()
         candidate_data_list = [
             {
                 "candidate_id": data[0],

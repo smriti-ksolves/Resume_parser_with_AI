@@ -3,6 +3,7 @@ from app.app import jwt, bcrypt
 from app.db.user_model import login_user
 from datetime import datetime, timedelta
 from app.helper.mail_vertification import resend_verification_email
+from flask import jsonify, make_response
 
 
 def signin_user(data):
@@ -28,15 +29,19 @@ def signin_user(data):
     if user and bcrypt.check_password_hash(user.password, password):
         # Check if the email is verified
         if not user.email_verified:
-            return resend_verification_email(email)
-
-        # Check for expired verification tokens
-        if user.verification_token_expiry and user.verification_token_expiry < datetime.utcnow():
-            return {'error': 'Verification token has expired. Please request a new verification link.'}
+            # Check for expired verification tokens
+            if user.verification_token_expiry and user.verification_token_expiry < datetime.utcnow():
+                res = resend_verification_email(email)
+                return res
+            else:
+                return make_response(jsonify({"error": "Email not verified. An email has already been sent to your "
+                                                       "account. Please check your email and verify your account."}),
+                                     401)
 
         # Generate an access token for the user's identity
         access_token = create_access_token(identity=user.id)
 
-        return {'access_token': access_token, "user_id": user.id, "username": user.first_name}
+        return make_response(jsonify({'access_token': access_token, "user_id": user.id, "username": user.first_name}),
+                             200)
     else:
-        return {'error': 'Invalid credentials.'}
+        return make_response(jsonify({'error': 'Invalid credentials.'}), 401)

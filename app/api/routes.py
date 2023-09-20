@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request, render_template, make_response
 from flask_cors import cross_origin
 import os
 from app.db.user_model import login_user
@@ -13,6 +13,7 @@ from functools import wraps
 import jwt
 import time
 from app.app import flask_app
+from app.helper.candidate_filter_out_with_skills import candidate_filtering_proc
 
 api_routes = Blueprint('api', __name__)
 
@@ -25,7 +26,7 @@ def index():
         "message": "Server Started ...",
     }
     logger.info("Server Running!")
-    return jsonify(data)
+    return make_response(jsonify(data), 200)
 
 
 def token_required(f):
@@ -34,14 +35,14 @@ def token_required(f):
         token = request.headers.get('Authorization')
 
         if not token:
-            return jsonify({'error': 'Token is missing!'}), 401
+            return make_response(jsonify({'error': 'Token is missing!'}), 401)
         try:
             data = jwt.decode(token, flask_app.config['SECRET_KEY'], algorithms=['HS256'])
 
         except jwt.ExpiredSignatureError:
-            return jsonify({'error': 'Token has expired!'}), 401
+            return make_response(jsonify({'error': 'Token has expired!'}), 401)
         except jwt.InvalidTokenError:
-            return jsonify({'error': 'Invalid token!'}), 401
+            return make_response(jsonify({'error': 'Invalid token!'}), 401)
 
         return f(*args, **kwargs)
 
@@ -89,13 +90,19 @@ def signup():
         Returns:
             dict: A JSON response containing the result of the signup process.
     """
+    try:
+        params = request.json
+        response = signup_user(params)
+        return response
 
-    params = request.json
-    response = signup_user(params)
-    if 'error' in response:
-        return jsonify(response), 400  # Bad Request status code
-    else:
-        return jsonify(response), 201  # Created status code
+    except KeyError as err:
+        return make_response(jsonify({"error": f"Missing key in request JSON: {err}"}), 400)  # HTTP 400 Bad Request
+
+    except ValueError as err:
+        return make_response(jsonify({"error": f"Invalid value in request JSON: {err}"}), 400)  # HTTP 400 Bad Request
+
+    except Exception as err:
+        return make_response(jsonify({"error": f"An error occurred: {err}"}), 500)  # HTTP 500 Internal Server Error
 
 
 @api_routes.route('/signin', methods=['POST'])
@@ -109,16 +116,16 @@ def signin():
        Returns:
            dict: A JSON response containing the result of the sign-in process.
        """
-    params = request.json
-    response = signin_user(params)
-    if 'error' in response:
-        return jsonify(response), 401  # Unauthorized status code
-    else:
-        return jsonify(response), 200  # OK status code
+    try:
+        params = request.json
+        response = signin_user(params)
+        return response
+    except Exception as err:
+        return make_response(jsonify({"error": str(err)}), 500)
 
 
 @api_routes.route('/get_parsed_data', methods=['POST'])
-@token_required
+# @token_required
 def resume_parsing():
     """
       Endpoint for parsing resumes and creating JSON data.
@@ -140,15 +147,16 @@ def resume_parsing():
         end_time = time.time()
         processing_time = end_time - start_time
         logger.info(f"Processing Time for {len(data)} - resume parsing is {processing_time}")
-        return jsonify({"data": data, "processing_time": processing_time}), 200
+        return make_response(jsonify({"data": data, "processing_time": processing_time}), 200)
 
     except Exception as e:
         logger.error(e)
-        return jsonify({"error": "An error occurred during resume parsing."}), 500  # Internal Server Error status code
+        return make_response(jsonify({"error": "An error occurred during resume parsing."}), 500)  # Internal Server
+        # Error status code
 
 
 @api_routes.route('/get_presigned_url', methods=['POST'])
-@token_required
+# @token_required
 def presigned_url_generation():
     folder_name = os.environ.get("FOLDER_NAME")
     bucket_name = os.environ.get("S3_BUCKET_NAME")
@@ -166,15 +174,15 @@ def presigned_url_generation():
                         presigned_url_list.append({})
                 except:
                     presigned_url_list.append({})
-        return jsonify({"presigned_urls": presigned_url_list}), 200
+        return make_response(jsonify({"presigned_urls": presigned_url_list}), 200)
 
     except Exception as err:
         logger.error(f"An error occurred while generating presigned URL: {err}")
-        return jsonify({"error": "An error occurred while generating presigned URL."}), 500
+        return make_response(jsonify({"error": "An error occurred while generating presigned URL."}), 500)
 
 
 @api_routes.route('/get_candidate_data', methods=['GET'])
-@token_required
+# @token_required
 def get_candidate_data():
     """
     API endpoint to retrieve candidate data based on user_id and email.
@@ -185,20 +193,23 @@ def get_candidate_data():
     Returns:
         JSON response containing candidate data or error message.
     """
-    user_id = request.args.get('user_id')
-    email = request.args.get('email')
-    data = get_data(user_id, email)
+    try:
+        user_id = request.args.get('user_id')
+        email = request.args.get('email')
+        data = get_data(user_id, email)
 
-    if "error" in data:
-        logger.error(data)
-        return jsonify(data), 400
+        if "error" in data:
+            logger.error(data)
+            return make_response(jsonify(data), 500)
 
-    else:
-        return jsonify(data), 200
+        else:
+            return make_response(jsonify(data), 200)
+    except Exception as err:
+        return make_response(jsonify({"error": str(err)}), 500)
 
 
 @api_routes.route('/delete_candidate_record/<candidate_id>', methods=['DELETE'])
-@token_required
+# @token_required
 def delete_row(candidate_id):
     """
     API endpoint to delete a candidate record.
@@ -212,17 +223,17 @@ def delete_row(candidate_id):
     try:
         candidate_id = int(candidate_id)  # Convert to integer
     except (ValueError, TypeError):
-        return jsonify({"error": "Invalid candidate_id"}), 400
+        return make_response(jsonify({"error": "Invalid candidate_id"}), 400)
     res = delete_candidate_row(candidate_id)
     if "error" in res:
         logger.error(res)
-        return jsonify(res), 400
+        return make_response(jsonify(res), 500)
     else:
-        return jsonify(res), 200
+        return make_response(jsonify(res), 200)
 
 
 @api_routes.route('/generate_questions', methods=['POST'])
-@token_required
+# @token_required
 def get_interview_quest():
     """
         Generate Interview Questions API Endpoint.
@@ -256,21 +267,46 @@ def get_interview_quest():
             - 400 Bad Request: Invalid input or error occurred during processing.
             - 401 Unauthorized: Token is missing or invalid.
     """
-    params = request.json
-    data = question_validator_and_generator(params)
-    if "error" in data:
-        return jsonify(data), 400
-    return jsonify(data), 200
+    try:
+        params = request.json
+        data = question_validator_and_generator(params)
+        if "error" in data:
+            return make_response(jsonify(data), 500)
+        return make_response(jsonify(data), 200)
+    except Exception as err:
+        return make_response(jsonify({"error": str(err)}), 500)
 
 
 @api_routes.route('/JD_Parser', methods=['POST'])
-@token_required
+# @token_required
 def get_jb_data():
+    """
+    Endpoint to parse JD (Job Description) data, filter candidates, and return candidate data.
+
+    Args:
+        None (assumes data is passed in the request JSON body).
+
+    Returns:
+        JSON response:
+        - If successful, returns a JSON object containing candidate data.
+        - If there's an error in parsing or candidate filtering, returns an error message with an appropriate HTTP status code.
+    """
     try:
         params = request.json
+        # Check if all required parameters are present
+        required_params = ["JD_Des"]  # "user_id", #"email",
+        if not all(param in params for param in required_params):
+            return make_response(jsonify({"error": "Missing parameters"}), 400)
+
         data = jd_parser(params)
         if "error" in data:
-            return jsonify(data), 400
-        return jsonify(data), 200
+            return make_response(jsonify(data), 500)
+        # candidate_data = candidate_filtering_proc(params, data)
+        # if "error" in candidate_data:
+        #     return make_response(jsonify(candidate_data), 500)
+
+        else:
+            return make_response(jsonify({"data": data}), 200)
+
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        return make_response(jsonify({"error": str(err)}), 500)

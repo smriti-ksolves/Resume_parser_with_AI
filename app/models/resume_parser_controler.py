@@ -43,13 +43,13 @@ def get_extracted_data(params):
                     if res is not None:
                         data = response_validation(res)
                         if data:
-                            # Remove the local PDF file
-                            response = resume_data_create(params, data)
-                            if response is not None:
-                                data_dict[file] = response
-                                candidates_data.append(data_dict)
-                            else:
-                                candidates_data.append({file: {"error": "Error while storing data in database"}})
+                            # # Remove the local PDF file
+                            # response = resume_data_create(params, data)
+                            # if response is not None:
+                            data_dict[file] = data
+                            candidates_data.append(data_dict)
+                            # else:
+                            #     candidates_data.append({file: {"error": "Error while storing data in database"}})
                         else:
                             candidates_data.append({file: {"error": "Parser Data has some incorrect data format"}})
                     else:
