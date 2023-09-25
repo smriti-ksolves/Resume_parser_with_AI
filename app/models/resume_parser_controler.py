@@ -46,28 +46,28 @@ def get_extracted_data(params):
                             # # Remove the local PDF file
                             # response = resume_data_create(params, data)
                             # if response is not None:
-                            merged_dict = {**data_dict, **data, "file_status": "success"}
+                            merged_dict = {**data_dict, **data, "uploading_status": "success"}
                             # data_dict[file] = data
                             candidates_data.append(merged_dict)
                             # else:
                             #     candidates_data.append({file: {"error": "Error while storing data in database"}})
                         else:
-                            error_data = {"error": "Parser Data has some incorrect data format", "file_status": "error"}
+                            error_data = {"error": "Parser Data has some incorrect data format", "uploading_status": "error"}
                             merged_dict = {**data_dict, **error_data}
                             candidates_data.append(merged_dict)
                     else:
-                        error_data = {"error": "Error While parsing data from open AI", "file_status": "error"}
+                        error_data = {"error": "Error While parsing data from open AI", "uploading_status": "error"}
                         merged_dict = {**data_dict, **error_data}
                         candidates_data.append(merged_dict)
 
                 else:
-                    error_data = {"error": "Error while Extracting data from pdf", "file_status": "error"}
+                    error_data = {"error": "Error while Extracting data from pdf", "uploading_status": "error"}
                     merged_dict = {**data_dict, **error_data}
                     candidates_data.append(merged_dict)
 
             except Exception as err:
                 logger.error(err)
-                error_data = {"error": str(err), "status": "error"}
+                error_data = {"error": str(err), "uploading_status": "error"}
                 merged_dict = {**data_dict, **error_data}
                 candidates_data.append(merged_dict)
 
@@ -75,7 +75,7 @@ def get_extracted_data(params):
                 if os.path.exists(file_obj):
                     os.remove(file_obj)
         else:
-            error_data = {"error": "Please upload pdf only under 50 kb"}
+            error_data = {"error": "Please upload pdf only under 50 kb", "uploading_status": "error"}
             merged_dict = {**data_dict, **error_data}
             candidates_data.append(merged_dict)
     return candidates_data
