@@ -147,7 +147,7 @@ def resume_parsing():
         end_time = time.time()
         processing_time = end_time - start_time
         logger.info(f"Processing Time for {len(data)} - resume parsing is {processing_time}")
-        return make_response(jsonify({"data": data, "processing_time": processing_time}), 200)
+        return make_response(jsonify({"data": data}), 200)
 
     except Exception as e:
         logger.error(e)

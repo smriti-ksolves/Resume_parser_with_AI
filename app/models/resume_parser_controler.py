@@ -22,7 +22,7 @@ def get_extracted_data(params):
     """
     candidates_data = []
     for file in params.get("files"):
-        data_dict = dict()
+        data_dict = {"file_name": file}
         prompt_file_path = r"app/db/resume_parser_prompt.txt"
         if isinstance(file, str) and file.endswith(".pdf"):
             folder = os.environ.get("FOLDER_NAME")
@@ -46,24 +46,36 @@ def get_extracted_data(params):
                             # # Remove the local PDF file
                             # response = resume_data_create(params, data)
                             # if response is not None:
-                            data_dict[file] = data
-                            candidates_data.append(data_dict)
+                            merged_dict = {**data_dict, **data, "file_status": "success"}
+                            # data_dict[file] = data
+                            candidates_data.append(merged_dict)
                             # else:
                             #     candidates_data.append({file: {"error": "Error while storing data in database"}})
                         else:
-                            candidates_data.append({file: {"error": "Parser Data has some incorrect data format"}})
+                            error_data = {"error": "Parser Data has some incorrect data format", "file_status": "error"}
+                            merged_dict = {**data_dict, **error_data}
+                            candidates_data.append(merged_dict)
                     else:
-                        candidates_data.append({file: {"error": "Error While parsing data from open AI"}})
+                        error_data = {"error": "Error While parsing data from open AI", "file_status": "error"}
+                        merged_dict = {**data_dict, **error_data}
+                        candidates_data.append(merged_dict)
+
                 else:
-                    candidates_data.append({file: {"error": "Error while Extracting data from pdf"}})
+                    error_data = {"error": "Error while Extracting data from pdf", "file_status": "error"}
+                    merged_dict = {**data_dict, **error_data}
+                    candidates_data.append(merged_dict)
 
             except Exception as err:
                 logger.error(err)
-                candidates_data.append({file: {"error": str(err)}})
+                error_data = {"error": str(err), "status": "error"}
+                merged_dict = {**data_dict, **error_data}
+                candidates_data.append(merged_dict)
 
             finally:
                 if os.path.exists(file_obj):
                     os.remove(file_obj)
         else:
-            candidates_data.append({file: {"error": "Please upload pdf only under 50 kb"}})
+            error_data = {"error": "Please upload pdf only under 50 kb"}
+            merged_dict = {**data_dict, **error_data}
+            candidates_data.append(merged_dict)
     return candidates_data

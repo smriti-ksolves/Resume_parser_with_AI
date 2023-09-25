@@ -11,7 +11,7 @@ pattern = regex.compile(r'\{(?:[^{}]|(?R))*\}')
 
 # Define a list of keys for the filtered data
 my_keys = ['name', 'email_id', 'phone_no', 'total_experience', 'current_employer', 'current_designation', 'skills',
-           'current_skills', 'location', 'project_names', 'company_count','company_names']
+           'current_skills', 'location']
 
 # Construct the path to the .env file
 dotenv_path = os.path.join(os.getcwd(), '.env')
